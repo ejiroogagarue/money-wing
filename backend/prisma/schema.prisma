@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String
+  status       String     @default("pending")
+  kycStatus    String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  otpTokens    OtpToken[]
+}
+
+model OtpToken {
+  id        String   @id @default(uuid())
+  tokenHash String
+  purpose   String   @default("signup")
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
