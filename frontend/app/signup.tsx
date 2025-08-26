@@ -2,13 +2,15 @@ import axios from 'axios';
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { API_BASE_URL } from "./constants/config";
+
 export default function SignUpScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSignUp = async () => {
     try {
-        const response = await axios.post('http://localhost:3000/auth/signup', {
+        const response = await axios.post(`${API_BASE_URL}/auth/signup`, {
             email,
             password
         });

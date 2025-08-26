@@ -1,0 +1,15 @@
+{
+  "name": "moneywing",
+  "version": "1.0.0",
+  "description": "MoneyWing - Send money to Uganda seamlessly",
+  "main": "backend/dist/index.js",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "build": "cd backend && npm run build",
+    "postinstall": "cd backend && npm install && npm run build"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "private": true
+}
