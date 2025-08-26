@@ -1,26 +1,29 @@
-import axios from 'axios';
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
-import { API_BASE_URL } from "./constants/config";
+import { authAPI } from "../services/api";
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
-    try {
-        const response = await axios.post(`${API_BASE_URL}/auth/signup`, {
-            email,
-            password
-        });
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
 
-        Alert.alert('Success', 'OTP sent to your email!');
-        router.push({ pathname: '/otp', params: {email }});
+    setLoading(true);
+    try {
+      await authAPI.signup(email, password);
+      Alert.alert('Success', 'OTP sent to your email!');
+      router.push({ pathname: '/otp', params: {email} });
     } catch (error: any) {
       Alert.alert('Error', error.response?.data?.error || 'Signup failed');
+    } finally {
+      setLoading(false);
     }
-    
   };
 
   return (

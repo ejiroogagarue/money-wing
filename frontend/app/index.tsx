@@ -15,7 +15,10 @@ export default function WelcomeScreen() {
           title="Login"
           onPress={() => alert("Login screen coming soon!")}
           color="#666"
-        ></Button>
+        />
+        <Link href="/api-test" asChild>
+          <Button title="Test API Connection" color="#28a745" />
+        </Link>
       </View>
     </View>
   );

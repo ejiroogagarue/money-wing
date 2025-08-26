@@ -1,25 +1,29 @@
-import axios from 'axios';
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
-import { API_BASE_URL } from "./constants/config";
+import { authAPI } from "../services/api";
 
 export default function OTPScreen() {
     const [otp, setOtp] = useState('');
+    const [loading, setLoading] = useState(false);
     const params = useLocalSearchParams();
     const email = params.email as string;
 
     const verifyOtp = async () => {
+        if (!otp || otp.length !== 6) {
+            Alert.alert('Error', 'Please enter a valid 6-digit OTP');
+            return;
+        }
+
+        setLoading(true);
         try {
-            const response = await axios.post(`${API_BASE_URL}/auth/verify-otp`, {
-                email,
-                otpCode: otp
-            });
-            // Store token (you'll add secure storage later)
+            await authAPI.verifyOTP(email, otp);
             Alert.alert('Success', 'Account verified!');
             router.replace('/dashboard');
         } catch (error: any) {
             Alert.alert('Error', error.response?.data?.error || 'Verification failed');
+        } finally {
+            setLoading(false);
         }
     };
 
