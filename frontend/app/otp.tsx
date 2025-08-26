@@ -1,6 +1,17 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+    Alert,
+    Button,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableWithoutFeedback,
+    View
+} from "react-native";
 import { authAPI } from "../services/api";
 
 export default function OTPScreen() {
@@ -18,9 +29,10 @@ export default function OTPScreen() {
         setLoading(true);
         try {
             await authAPI.verifyOTP(email, otp);
-            Alert.alert('Success', 'Account verified!');
+            // SUCCESS: Navigate immediately to dashboard
             router.replace('/dashboard');
         } catch (error: any) {
+            // ERROR: Show alert only on failure
             Alert.alert('Error', error.response?.data?.error || 'Verification failed');
         } finally {
             setLoading(false);
@@ -28,25 +40,45 @@ export default function OTPScreen() {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Verify Your Email</Text>
-            <Text style={styles.subtitle}>Enter the OTP sent to {email}</Text>
-            <TextInput
-             style={styles.input}
-             placeholder="Enter OTP Code"
-             value={otp}
-             onChangeText={setOtp}
-             keyboardType="numeric"
-             maxLength={6}
-            />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <KeyboardAvoidingView 
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                style={styles.container}
+            >
+                <View style={styles.innerContainer}>
+                    <Text style={styles.title}>Verify Your Email</Text>
+                    <Text style={styles.subtitle}>Enter the OTP sent to {email}</Text>
+                    
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Enter OTP Code"
+                        value={otp}
+                        onChangeText={setOtp}
+                        keyboardType="numeric"
+                        maxLength={6}
+                        onSubmitEditing={verifyOtp} // Submit on enter key
+                        returnKeyType="done"
+                    />
 
-            <Button title="Verify OTP" onPress={verifyOtp}/>
-        </View>
-    )
+                    <View style={styles.buttonContainer}>
+                        <Button 
+                            title={loading ? "Verifying..." : "Verify OTP"} 
+                            onPress={verifyOtp}
+                            disabled={loading}
+                        />
+                    </View>
+                </View>
+            </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
+    innerContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
@@ -56,6 +88,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 10,
+        color: '#1E40AF',
     },
     subtitle: {
         fontSize: 16,
@@ -73,6 +106,10 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         fontSize: 18,
         textAlign: 'center',
+        backgroundColor: '#f8f9fa',
+    },
+    buttonContainer: {
+        width: '80%',
+        marginTop: 10,
     },
 });
-
